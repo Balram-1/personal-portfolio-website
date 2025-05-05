@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title id="site-title">Balram</title>
+<link rel="icon" href="favicon.png" />
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: 'VT323', monospace;
+    background: #101010;
+    color: #fff;
+    overflow: hidden;
+    min-height: 100vh;
+    cursor: none;
+  }
+  #bgVideo {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+    filter: brightness(0.6) blur(1px);
+  }
+  #preloader {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(24,24,24,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer !important;
+  }
+  .preloader-center {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2em; margin-bottom: 30px;
+  }
+  .typing-text {
+    font-family: 'VT323', monospace;
+    color: #fff;
+    white-space: nowrap;
+    font-size: 1.1em;
+    letter-spacing: 2px;
+  }
+  .blinking-cursor {
+    display: inline-block;
+    width: 1ch;
+    animation: blink 1s steps(1) infinite;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-left: 2px;
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  .main-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 70vw;
+    min-width: 320px;
+    max-width: 650px;
+    min-height: 440px;
+    background: rgba(20,20,20,0.46);
+    border-radius: 24px;
+    box-shadow: 0 0 28px 8px rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+    margin: 5vw auto 0 auto;
+    transition: box-shadow 0.5s cubic-bezier(0.175,0.885,0.32,1.275), transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    flex-wrap: wrap;
+  }
+  .logo-side {
+    flex: 0 0 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 32px;
+  }
+  .logo-gif {
+    width: 110px; height: 110px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.3);
+    box-shadow: none !important;
+  }
+  .info-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 32px 32px 32px 24px;
+    position: relative;
+    min-width: 300px;
+  }
+  #username {
+    font-family: 'VT323', monospace;
+    font-size: 2.7em;
+    font-weight: normal;
+    margin: 0 0 5px 0;
+    letter-spacing: 2px;
+    text-align: left;
+    line-height: 1.1;
+    position: relative;
+    display: flex;
+    align-items: baseline;
+  }
+  #username-text {
+    position: relative;
+    z-index: 1;
+  }
+  #sparkle-container {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .by {
+    font-family: 'VT323', monospace;
+    font-size: 1em;
+    color: #888888;
+    margin-left: 12px;
+    user-select: none;
+    line-height: 1;
+  }
+  .tagline-container {
+    margin-bottom: 18px;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+  }
+  #tagline {
+    font-family: 'VT323', monospace;
+    font-size: 1em;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .link-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .link-grid a {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 7px 12px;
+    text-decoration: none;
+    color: #fff;
+    transition: background 0.2s, transform 0.2s;
+    font-size: 1.1em;
+  }
+  .link-grid a:hover {
+    background: rgba(0,255,247,0.13);
+    transform: scale(1.08);
+  }
+  .link-grid img {
+    width: 28px;
+    height: 28px;
+    margin-right: 7px;
+    filter: none;
+  }
+  .top-bar {
+    position: fixed;
+    top: 22px;
+    width: 100vw;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 10;
+    padding: 0 36px;
+  }
+  #visitorCounter {
+    background: none;
+    border-radius: 0;
+    padding: 5px 10px;
+    font-size: 1.1em;
+    color: #fff;
+    box-shadow: none;
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+  #cursor {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 8px 2px #fff;
+    transition: transform 0.1s;
+  }
+  .snowflake {
+    position: fixed;
+    top: 0;
+    font-size: 18px;
+    color: #fff;
+    opacity: 0.85;
+    pointer-events: none;
+    z-index: 999;
+    animation: snow-fall 13s linear forwards;
+    filter: none;
+    text-shadow: 0 0 4px #fff;
+  }
+  @keyframes snow-fall {
+    0% { transform: translateY(-10px) translateX(0);}
+    100% { transform: translateY(100vh) translateX(var(--zigzag, 0px));}
+  }
+  @media (max-width: 900px) {
+    .main-content {
+      width: 97vw;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 2vw;
+      min-height: 420px;
+    }
+    .logo-side { padding-left: 0; padding-bottom: 15px; }
+    .info-side { padding: 5px 15px 15px 15px; align-items: center; }
+    #username { text-align: center; font-size: 2.2em; }
+    .tagline-container { justify-content: center; }
+    .link-grid { justify-content: center; }
+    .top-bar { padding: 0 10px; }
+  }
+  body::-webkit-scrollbar { display: none; }
+  #mainContent { cursor: none; }
+  #music-info {
+    font-family: 'VT323', monospace;
+    font-size: 1em;
+    color: #00fff7;
+    text-align: center;
+    margin-top: 10px;
+    user-select: none;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #music-info .icon {
+    font-size: 1.4em;
+  }
+  #music-info .title {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #music-info .time {
+    font-size: 0.9em;
+    color: #66ffff;
+    min-width: 70px;
+    text-align: right;
+  }
+  #music-progress {
+    width: 100%;
+    margin-top: 6px;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: #222;
+    pointer-events: none; /* non-interactive */
+  }
+  #music-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+</style>
+</head>
+<body>
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="preloader-center">
+      <span class="typing-text" id="preloader-text"></span>
+      <span class="blinking-cursor" id="preloader-cursor">|</span>
+    </div>
+    <div id="preloader-snow"></div>
+  </div>
+  <!-- Main Content -->
+  <div id="mainContent" style="display:none;">
+    <video autoplay muted loop id="bgVideo">
+      <source src="background.mp4" type="video/mp4" />
+    </video>
+    <div class="top-bar">
+      <div id="visitorCounter">
+        <span id="views">0</span> views
+      </div>
+    </div>
+    <div class="main-content tilt" id="main-tilt">
+      <div class="logo-side">
+        <img src="logo.gif" alt="Logo" class="logo-gif" />
+      </div>
+      <div class="info-side">
+        <h1 id="username">
+          <span id="username-text"></span>
+          <span class="by" id="byline"></span>
+          <span id="sparkle-container"></span>
+        </h1>
+        <div class="tagline-container">
+          <span id="tagline"></span><span class="blinking-cursor" id="tag-cursor">|</span>
+        </div>
+        <div class="link-grid"></div>
+        <audio id="audio-player" style="display:none;" autoplay></audio>
+       
+      </div>
+    </div>
+    <div id="main-snow"></div>
+  </div>
+  <div id="cursor"></div>
+  <script>
+    const config = {
+      site_name: "Balram",
+      favicon: "favicon.png",
+      logo: "logo.gif",
+      username: "Balram",
+      by: "v1.1",
+      tagline: "Building Awesome Stuff!!!",
+      background_video: "background.mp4",
+      webhook_url: "",
+      ip_api_key: "",
+      icons_folder: "assets/icons/",
+      music_files: [
+        "assets/music/SpotiMate.io - GBP _feat. 21 Savage_ - Central Cee.mp3",
+        "assets/music/Booter Bee - Phone Call.mp3",
+        "assets/music/touch.cas.mp3"
+      ],
+      links: [
+        { name: "GitHub", icon: "github.png", url: "https://github.com/Balram-1" },
+        { name: "Steam", icon: "steam.png", url: "" },
+        { name: "Discord", icon: "discord.png", url: "" },
+        { name: "LTC", icon: "ltc.png", url: "https://blockchair.com/litecoin/address/ltc1q2j4zjvuusddwf66mzv2wud8r6ejc38sjpjp5d5" },
+        { name: "Spotify", icon: "spotify.png", url: "" },
+        { name: "Try Hack Me", icon: "tryhackme.png", url: "" }
+      ]
+    };
+
+    // Cursor init
+    const cursor = document.getElementById("cursor");
+    cursor.style.left = window.innerWidth / 2 + "px";
+    cursor.style.top = window.innerHeight / 2 + "px";
+    document.addEventListener("mousemove", e => {
+      cursor.style.left = e.clientX + "px";
+      cursor.style.top = e.clientY + "px";
+    });
+
+    // Site title typing/erasing effect
+    const siteTitle = document.getElementById("site-title");
+    const fullText = config.site_name;
+    const eraseUpToChar = fullText[0];
+    const eraseIndex = fullText.indexOf(eraseUpToChar) + 1;
+    let step = 0, phase = "typing", displayText = "";
+    function typeEraseLoop() {
+      if (phase === "typing") {
+        step++;
+        if (step > fullText.length) {
+          phase = "erasing";
+          step = fullText.length;
+        }
+      } else if (phase === "erasing") {
+        step--;
+        if (step < eraseIndex) {
+          phase = "typingFromErase";
+          step = eraseIndex;
+        }
+      } else if (phase === "typingFromErase") {
+        step++;
+        if (step > fullText.length) {
+          phase = "erasing";
+          step = fullText.length;
+        }
+      }
+      displayText = fullText.slice(0, step);
+      siteTitle.textContent = displayText;
+      setTimeout(typeEraseLoop, 180);
+    }
+    typeEraseLoop();
+
+    // Preloader typing effect
+    const preloaderText = document.getElementById("preloader-text");
+    let preloaderMsg = "Click to Enter!";
+    let preloaderIdx = 0, preloaderDir = 1;
+    setInterval(() => {
+      if (preloaderDir === 1) {
+        preloaderIdx++;
+        if (preloaderIdx > preloaderMsg.length) preloaderDir = -1;
+      } else {
+        preloaderIdx--;
+        if (preloaderIdx === 0) preloaderDir = 1;
+      }
+      preloaderText.textContent = preloaderMsg.slice(0, preloaderIdx);
+    }, 100);
+
+    // Snow effect
+    function createSnow(containerId, speed = 1, zigzag = false) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      setInterval(() => {
+        if (!document.body.contains(container)) return;
+        let flake = document.createElement("div");
+        flake.className = "snowflake";
+        flake.textContent = "❄";
+        flake.style.left = Math.random() * 100 + "vw";
+        flake.style.fontSize = 14 + Math.random() * 10 + "px";
+        flake.style.opacity = 0.7 + Math.random() * 0.3;
+        if (zigzag) {
+          flake.style.setProperty("--zigzag", (Math.random() > 0.5 ? 1 : -1) * 80 + "px");
+        }
+        container.appendChild(flake);
+        setTimeout(() => {
+          if (container.contains(flake)) container.removeChild(flake);
+        }, 13000 / speed);
+      }, 600 / speed);
+    }
+    createSnow("preloader-snow", 0.7, true);
+
+    // Enter site
+    document.getElementById("preloader").addEventListener("click", () => {
+      document.getElementById("preloader").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      startMainFeatures();
+    });
+
+    // Main features
+    function startMainFeatures() {
+      // Background video
+      const videoSource = document.getElementById("bgVideo").querySelector("source");
+      if (videoSource) {
+        videoSource.src = config.background_video;
+        document.getElementById("bgVideo").load();
+      }
+
+      // Username and byline
+      document.getElementById("username-text").textContent = config.username;
+      document.getElementById("byline").textContent = config.by;
+      startSparkles();
+
+      // Tagline typing
+      const tagline = config.tagline;
+      let tagIdx = 0, tagDir = 1;
+      function tagTick() {
+        document.getElementById("tagline").textContent = tagline.slice(0, tagIdx);
+        if (tagDir === 1) {
+          tagIdx++;
+          if (tagIdx > tagline.length) tagDir = -1;
+        } else {
+          tagIdx--;
+          if (tagIdx < 0) tagDir = 1;
+        }
+        setTimeout(tagTick, 90);
+      }
+      tagTick();
+
+      // Social links
+      const grid = document.querySelector(".link-grid");
+      grid.innerHTML = "";
+      config.links.forEach(link => {
+        let a = document.createElement("a");
+        a.href = link.url;
+        a.target = "_blank";
+        let img = document.createElement("img");
+        img.src = config.icons_folder + link.icon;
+        img.alt = link.name;
+        a.appendChild(img);
+        let span = document.createElement("span");
+        span.textContent = link.name;
+        a.appendChild(span);
+        grid.appendChild(a);
+      });
+
+      // Main snow
+      createSnow("main-snow", 0.5, true);
+
+      // Cursor snow trail
+      document.addEventListener("mousemove", e => {
+        let flake = document.createElement("div");
+        flake.className = "snowflake";
+        flake.textContent = "❄";
+        flake.style.left = e.clientX + (Math.random() * 8 - 4) + "px";
+        flake.style.top = e.clientY + (Math.random() * 8 - 4) + "px";
+        flake.style.fontSize = 10 + Math.random() * 8 + "px";
+        flake.style.opacity = 0.7 + Math.random() * 0.3;
+        document.body.appendChild(flake);
+        setTimeout(() => {
+          if (document.body.contains(flake)) document.body.removeChild(flake);
+        }, 1800);
+      });
+
+      // Visitor counter and webhook
+      updateVisitorCounter();
+      sendVisitorWebhook();
+
+      // 3D tilt effect
+      if (window.VanillaTilt && document.querySelector(".tilt")) {
+        VanillaTilt.init(document.querySelector(".tilt"), {
+          max: 10,
+          speed: 800,
+          glare: false,
+          "max-glare": 0.1,
+          scale: 1.02,
+        });
+      }
+
+      // Start music player
+      startMusicPlayer();
+    }
+
+    // Sparkles on username only
+    function startSparkles() {
+      const container = document.getElementById("sparkle-container");
+      if (!container) return;
+      function createSparkle() {
+        if (!container || !document.body.contains(container)) return;
+        const sparkle = document.createElement("span");
+        sparkle.textContent = "✦";
+        sparkle.style.position = "absolute";
+        sparkle.style.left = Math.random() * 100 + "%";
+        sparkle.style.top = Math.random() * 100 + "%";
+        sparkle.style.fontSize = 6 + Math.random() * 6 + "px"; // smaller sparkles
+        sparkle.style.opacity = 0.7 + Math.random() * 0.3;
+        sparkle.style.color = "#fff";
+        sparkle.style.pointerEvents = "none";
+        sparkle.style.textShadow = "0 0 6px #fff, 0 0 3px #fff";
+
+        sparkle.animate(
+          [
+            { transform: "translate(0, 0)" },
+            {
+              transform: `translate(${(Math.random() - 0.5) * 10}px, ${
+                (Math.random() - 0.5) * 10
+              }px)`,
+            },
+            { transform: "translate(0, 0)" },
+          ],
+          {
+            duration: 3000 + Math.random() * 2000,
+            iterations: Infinity,
+          }
+        );
+
+        container.appendChild(sparkle);
+        setTimeout(() => {
+          if (container.contains(sparkle)) container.removeChild(sparkle);
+        }, 3000 + Math.random() * 2000);
+      }
+      setInterval(createSparkle, 400);
+    }
+
+    // Music player: plays all files from assets/music sequentially without UI controls
+    function startMusicPlayer() {
+      const audio = document.getElementById("audio-player");
+      const musicFiles = config.music_files;
+      let idx = Math.floor(Math.random() * musicFiles.length);
+
+      function playNext() {
+        audio.src = musicFiles[idx];
+        audio.play().catch(() => {});
+        idx = (idx + 1) % musicFiles.length;
+      }
+
+      audio.addEventListener("ended", playNext);
+      playNext();
+    }
+
+    // Visitor counter stored in localStorage (simple)
+    function updateVisitorCounter() {
+      let visits = localStorage.getItem("visits") || 0;
+      visits = parseInt(visits) + 1;
+      localStorage.setItem("visits", visits);
+      const viewsElement = document.getElementById("views");
+      if (viewsElement) {
+        viewsElement.textContent = visits;
+      }
+    }
+
+    // Discord webhook visitor log
+    function sendVisitorWebhook() {
+      fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=${config.ip_api_key}`)
+        .then((resp) => resp.json())
+        .then((ipData) => {
+          let msg = `New visitor: ${ipData.ip}\nLocation: ${ipData.city}, ${ipData.country_name}\nTime: ${new Date().toLocaleString()}`;
+          fetch(config.webhook_url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: msg }),
+          });
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>

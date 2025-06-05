@@ -123,7 +123,7 @@
   }
   .by {
     font-family: 'VT323', monospace;
-    font-size: 1em;
+    font-size: 0.5em;
     color: #888888;
     margin-left: 12px;
     user-select: none;
@@ -178,16 +178,6 @@
     z-index: 10;
     padding: 0 36px;
   }
-  #visitorCounter {
-    background: none;
-    border-radius: 0;
-    padding: 5px 10px;
-    font-size: 1.1em;
-    color: #fff;
-    box-shadow: none;
-    margin-left: 10px;
-    white-space: nowrap;
-  }
   #cursor {
     position: fixed;
     width: 14px;
@@ -233,45 +223,6 @@
   }
   body::-webkit-scrollbar { display: none; }
   #mainContent { cursor: none; }
-  #music-info {
-    font-family: 'VT323', monospace;
-    font-size: 1em;
-    color: #00fff7;
-    text-align: center;
-    margin-top: 10px;
-    user-select: none;
-    letter-spacing: 1px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  #music-info .icon {
-    font-size: 1.4em;
-  }
-  #music-info .title {
-    flex-grow: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  #music-info .time {
-    font-size: 0.9em;
-    color: #66ffff;
-    min-width: 70px;
-    text-align: right;
-  }
-  #music-progress {
-    width: 100%;
-    margin-top: 6px;
-    -webkit-appearance: none;
-    height: 6px;
-    border-radius: 3px;
-    background: #222;
-    pointer-events: none; /* non-interactive */
-  }
-  #music-progress::-webkit-slider-thumb {
-    -webkit-appearance: none;
-  }
 </style>
 </head>
 <body>
@@ -288,11 +239,7 @@
     <video autoplay muted loop id="bgVideo">
       <source src="background.mp4" type="video/mp4" />
     </video>
-    <div class="top-bar">
-      <div id="visitorCounter">
-        <span id="views">0</span> views
-      </div>
-    </div>
+    <div class="top-bar"></div>
     <div class="main-content tilt" id="main-tilt">
       <div class="logo-side">
         <img src="logo.gif" alt="Logo" class="logo-gif" />
@@ -308,7 +255,6 @@
         </div>
         <div class="link-grid"></div>
         <audio id="audio-player" style="display:none;" autoplay></audio>
-       
       </div>
     </div>
     <div id="main-snow"></div>
@@ -320,24 +266,24 @@
       favicon: "favicon.png",
       logo: "logo.gif",
       username: "Balram",
-      by: "v1.1",
+      by: "invincible v1.1",
       tagline: "Building Awesome Stuff!!!",
       background_video: "background.mp4",
-      webhook_url: "",
-      ip_api_key: "",
       icons_folder: "assets/icons/",
       music_files: [
         "assets/music/SpotiMate.io - GBP _feat. 21 Savage_ - Central Cee.mp3",
+        "assets/music/Artemas - i like the way you kiss me (official music video).mp3",
+        "assets/music/i like the way you kiss me (CS2 MONTAGE).mp3",
         "assets/music/Booter Bee - Phone Call.mp3",
         "assets/music/touch.cas.mp3"
       ],
       links: [
         { name: "GitHub", icon: "github.png", url: "https://github.com/Balram-1" },
-        { name: "Steam", icon: "steam.png", url: "" },
-        { name: "Discord", icon: "discord.png", url: "" },
+        { name: "Steam", icon: "steam.png", url: "https://steamcommunity.com/id/Balrampreet/" },
+        { name: "Discord", icon: "discord.png", url: "https://discord.com/users/1024993729582469130" },
         { name: "LTC", icon: "ltc.png", url: "https://blockchair.com/litecoin/address/ltc1q2j4zjvuusddwf66mzv2wud8r6ejc38sjpjp5d5" },
-        { name: "Spotify", icon: "spotify.png", url: "" },
-        { name: "Try Hack Me", icon: "tryhackme.png", url: "" }
+        { name: "Spotify", icon: "spotify.png", url: "https://open.spotify.com/user/31rooy6f3tn6d5idx5yffeihdjlm" },
+        { name: "Try Hack Me", icon: "tryhackme.png", url: "https://tryhackme.com/p/Balram11" }
       ]
     };
 
@@ -492,17 +438,12 @@
         }, 1800);
       });
 
-      // Visitor counter and webhook
-      updateVisitorCounter();
-      sendVisitorWebhook();
-
       // 3D tilt effect
       if (window.VanillaTilt && document.querySelector(".tilt")) {
         VanillaTilt.init(document.querySelector(".tilt"), {
           max: 10,
           speed: 800,
           glare: false,
-          "max-glare": 0.1,
           scale: 1.02,
         });
       }
@@ -522,28 +463,22 @@
         sparkle.style.position = "absolute";
         sparkle.style.left = Math.random() * 100 + "%";
         sparkle.style.top = Math.random() * 100 + "%";
-        sparkle.style.fontSize = 6 + Math.random() * 6 + "px"; // smaller sparkles
+        sparkle.style.fontSize = 6 + Math.random() * 6 + "px";
         sparkle.style.opacity = 0.7 + Math.random() * 0.3;
         sparkle.style.color = "#fff";
         sparkle.style.pointerEvents = "none";
         sparkle.style.textShadow = "0 0 6px #fff, 0 0 3px #fff";
-
         sparkle.animate(
           [
             { transform: "translate(0, 0)" },
-            {
-              transform: `translate(${(Math.random() - 0.5) * 10}px, ${
-                (Math.random() - 0.5) * 10
-              }px)`,
-            },
-            { transform: "translate(0, 0)" },
+            { transform: `translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)` },
+            { transform: "translate(0, 0)" }
           ],
           {
             duration: 3000 + Math.random() * 2000,
             iterations: Infinity,
           }
         );
-
         container.appendChild(sparkle);
         setTimeout(() => {
           if (container.contains(sparkle)) container.removeChild(sparkle);
@@ -566,32 +501,6 @@
 
       audio.addEventListener("ended", playNext);
       playNext();
-    }
-
-    // Visitor counter stored in localStorage (simple)
-    function updateVisitorCounter() {
-      let visits = localStorage.getItem("visits") || 0;
-      visits = parseInt(visits) + 1;
-      localStorage.setItem("visits", visits);
-      const viewsElement = document.getElementById("views");
-      if (viewsElement) {
-        viewsElement.textContent = visits;
-      }
-    }
-
-    // Discord webhook visitor log
-    function sendVisitorWebhook() {
-      fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=${config.ip_api_key}`)
-        .then((resp) => resp.json())
-        .then((ipData) => {
-          let msg = `New visitor: ${ipData.ip}\nLocation: ${ipData.city}, ${ipData.country_name}\nTime: ${new Date().toLocaleString()}`;
-          fetch(config.webhook_url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: msg }),
-          });
-        })
-        .catch(() => {});
     }
   </script>
 </body>

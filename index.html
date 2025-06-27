@@ -1,507 +1,756 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title id="site-title">Balram</title>
-<link rel="icon" href="favicon.png" />
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
-<style>
-  body {
-    margin: 0; padding: 0;
-    font-family: 'VT323', monospace;
-    background: #101010;
-    color: #fff;
-    overflow: hidden;
-    min-height: 100vh;
-    cursor: none;
-  }
-  #bgVideo {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    object-fit: cover;
-    z-index: -2;
-    filter: brightness(0.6) blur(1px);
-  }
-  #preloader {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(24,24,24,0.7);
-    backdrop-filter: blur(8px);
-    z-index: 1000;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    cursor: pointer !important;
-  }
-  .preloader-center {
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.2em; margin-bottom: 30px;
-  }
-  .typing-text {
-    font-family: 'VT323', monospace;
-    color: #fff;
-    white-space: nowrap;
-    font-size: 1.1em;
-    letter-spacing: 2px;
-  }
-  .blinking-cursor {
-    display: inline-block;
-    width: 1ch;
-    animation: blink 1s steps(1) infinite;
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.1em;
-    margin-left: 2px;
-  }
-  @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-  }
-  .main-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    width: 70vw;
-    min-width: 320px;
-    max-width: 650px;
-    min-height: 440px;
-    background: rgba(20,20,20,0.46);
-    border-radius: 24px;
-    box-shadow: 0 0 28px 8px rgba(0,0,0,0.45);
-    backdrop-filter: blur(4px);
-    margin: 5vw auto 0 auto;
-    transition: box-shadow 0.5s cubic-bezier(0.175,0.885,0.32,1.275), transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
-    flex-wrap: wrap;
-  }
-  .logo-side {
-    flex: 0 0 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-left: 32px;
-  }
-  .logo-gif {
-    width: 110px; height: 110px;
-    border-radius: 20px;
-    background: rgba(0,0,0,0.3);
-    box-shadow: none !important;
-  }
-  .info-side {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 32px 32px 32px 24px;
-    position: relative;
-    min-width: 300px;
-  }
-  #username {
-    font-family: 'VT323', monospace;
-    font-size: 2.7em;
-    font-weight: normal;
-    margin: 0 0 5px 0;
-    letter-spacing: 2px;
-    text-align: left;
-    line-height: 1.1;
-    position: relative;
-    display: flex;
-    align-items: baseline;
-  }
-  #username-text {
-    position: relative;
-    z-index: 1;
-  }
-  #sparkle-container {
-    position: absolute;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .by {
-    font-family: 'VT323', monospace;
-    font-size: 0.5em;
-    color: #888888;
-    margin-left: 12px;
-    user-select: none;
-    line-height: 1;
-  }
-  .tagline-container {
-    margin-bottom: 18px;
-    font-size: 1.3em;
-    display: flex;
-    align-items: center;
-  }
-  #tagline {
-    font-family: 'VT323', monospace;
-    font-size: 1em;
-    color: #fff;
-    letter-spacing: 1px;
-  }
-  .link-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 18px;
-  }
-  .link-grid a {
-    display: flex;
-    align-items: center;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 7px 12px;
-    text-decoration: none;
-    color: #fff;
-    transition: background 0.2s, transform 0.2s;
-    font-size: 1.1em;
-  }
-  .link-grid a:hover {
-    background: rgba(0,255,247,0.13);
-    transform: scale(1.08);
-  }
-  .link-grid img {
-    width: 28px;
-    height: 28px;
-    margin-right: 7px;
-    filter: none;
-  }
-  .top-bar {
-    position: fixed;
-    top: 22px;
-    width: 100vw;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    z-index: 10;
-    padding: 0 36px;
-  }
-  #cursor {
-    position: fixed;
-    width: 14px;
-    height: 14px;
-    background: #fff;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    box-shadow: 0 0 8px 2px #fff;
-    transition: transform 0.1s;
-  }
-  .snowflake {
-    position: fixed;
-    top: 0;
-    font-size: 18px;
-    color: #fff;
-    opacity: 0.85;
-    pointer-events: none;
-    z-index: 999;
-    animation: snow-fall 13s linear forwards;
-    filter: none;
-    text-shadow: 0 0 4px #fff;
-  }
-  @keyframes snow-fall {
-    0% { transform: translateY(-10px) translateX(0);}
-    100% { transform: translateY(100vh) translateX(var(--zigzag, 0px));}
-  }
-  @media (max-width: 900px) {
-    .main-content {
-      width: 97vw;
-      min-width: 0;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 2vw;
-      min-height: 420px;
-    }
-    .logo-side { padding-left: 0; padding-bottom: 15px; }
-    .info-side { padding: 5px 15px 15px 15px; align-items: center; }
-    #username { text-align: center; font-size: 2.2em; }
-    .tagline-container { justify-content: center; }
-    .link-grid { justify-content: center; }
-    .top-bar { padding: 0 10px; }
-  }
-  body::-webkit-scrollbar { display: none; }
-  #mainContent { cursor: none; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balram - Interactive Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'VT323', monospace;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            cursor: none;
+            position: relative;
+        }
+        
+        #bgVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            filter: brightness(0.4) blur(2px);
+        }
+        
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 5, 24, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: opacity 1s ease;
+        }
+        
+        .preloader-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px #00ffff;
+        }
+        
+        .typing-text {
+            color: #00ffff;
+            white-space: nowrap;
+            font-size: 1.5em;
+            letter-spacing: 3px;
+        }
+        
+        .blinking-cursor {
+            display: inline-block;
+            width: 1ch;
+            animation: blink 1s steps(1) infinite;
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-left: 5px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .view-counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            font-size: 1.4em;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 15px;
+            border-radius: 10px;
+            z-index: 10;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 800px;
+            min-height: 500px;
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 25px;
+            box-shadow: 
+                0 0 40px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 8vh auto 0;
+            padding: 100px 30px 40px;
+            position: relative;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .logo-top {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-top:hover {
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .logo-gif {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.5),
+                0 0 60px rgba(255, 0, 255, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+        }
+        
+        .info-side {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #username {
+            font-size: 3.2em;
+            font-weight: normal;
+            margin: 0 0 10px 0;
+            letter-spacing: 3px;
+            text-align: center;
+            position: relative;
+            text-shadow: 0 0 15px #00ffff;
+        }
+        
+        .by {
+            font-size: 0.7em;
+            color: #aaa;
+            margin-left: 15px;
+            user-select: none;
+        }
+        
+        .tagline-container {
+            margin: 20px 0 30px 0;
+            font-size: 1.6em;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            text-align: center;
+        }
+        
+        #tagline {
+            color: #fff;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .link-grid a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px 10px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .link-grid a:hover {
+            background: rgba(0, 255, 247, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .link-grid a:hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #00ffff;
+            animation: borderGlow 1.5s infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% { box-shadow: 0 0 5px #00ffff; }
+            50% { box-shadow: 0 0 25px #00ffff; }
+            100% { box-shadow: 0 0 5px #00ffff; }
+        }
+        
+        .link-grid img {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.7));
+            transition: transform 0.3s ease;
+        }
+        
+        .link-grid a:hover img {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .link-grid span {
+            font-size: 1.2em;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+        
+        .link-grid a:hover span {
+            color: #00ffff;
+            text-shadow: 0 0 15px #00ffff;
+        }
+        
+        .music-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .music-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+        }
+        
+        .music-btn:hover {
+            background: rgba(0, 255, 255, 0.3);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #00ffff;
+        }
+        
+        #cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            box-shadow: 
+                0 0 20px #00ffff,
+                0 0 40px #ff00ff;
+            transition: 
+                transform 0.1s,
+                width 0.3s,
+                height 0.3s,
+                background 0.3s;
+            mix-blend-mode: screen;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        #cursor.active {
+            opacity: 1;
+        }
+        
+        .cursor-trail {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 0, 255, 0.6);
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: 0 0 15px #ff00ff;
+            animation: trailFade 0.5s forwards;
+        }
+        
+        @keyframes trailFade {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+        
+        .snowflake {
+            position: fixed;
+            top: 0;
+            font-size: 24px;
+            color: #fff;
+            opacity: 0.9;
+            pointer-events: none;
+            z-index: 999;
+            animation: snow-fall 15s linear forwards;
+            text-shadow: 0 0 15px #00ffff;
+        }
+        
+        @keyframes snow-fall {
+            0% { transform: translateY(-10px) translateX(0); opacity: 0.8; }
+            100% { transform: translateY(100vh) translateX(var(--zigzag, 0px)); opacity: 0; }
+        }
+        
+        .sparkle {
+            position: absolute;
+            font-size: 16px;
+            color: #fff;
+            pointer-events: none;
+            z-index: 2;
+            text-shadow: 0 0 10px #00ffff;
+            animation: sparkleMove 2s linear infinite;
+        }
+        
+        @keyframes sparkleMove {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--tx, 10px), var(--ty, 10px)); opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                width: 95%;
+                padding: 80px 20px 30px;
+            }
+            
+            .logo-gif {
+                width: 110px;
+                height: 110px;
+            }
+            
+            #username {
+                font-size: 2.5em;
+            }
+            
+            .tagline-container {
+                font-size: 1.3em;
+            }
+            
+            .link-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-content {
+                padding-top: 70px;
+            }
+            
+            .logo-gif {
+                width: 90px;
+                height: 90px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Preloader -->
-  <div id="preloader">
-    <div class="preloader-center">
-      <span class="typing-text" id="preloader-text"></span>
-      <span class="blinking-cursor" id="preloader-cursor">|</span>
-    </div>
-    <div id="preloader-snow"></div>
-  </div>
-  <!-- Main Content -->
-  <div id="mainContent" style="display:none;">
-    <video autoplay muted loop id="bgVideo">
-      <source src="background.mp4" type="video/mp4" />
-    </video>
-    <div class="top-bar"></div>
-    <div class="main-content tilt" id="main-tilt">
-      <div class="logo-side">
-        <img src="logo.gif" alt="Logo" class="logo-gif" />
-      </div>
-      <div class="info-side">
-        <h1 id="username">
-          <span id="username-text"></span>
-          <span class="by" id="byline"></span>
-          <span id="sparkle-container"></span>
-        </h1>
-        <div class="tagline-container">
-          <span id="tagline"></span><span class="blinking-cursor" id="tag-cursor">|</span>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-center">
+            <span class="typing-text" id="preloader-text">Click to Enter!</span>
+            <span class="blinking-cursor" id="preloader-cursor">|</span>
         </div>
-        <div class="link-grid"></div>
-        <audio id="audio-player" style="display:none;" autoplay></audio>
-      </div>
+        <div id="preloader-snow"></div>
     </div>
-    <div id="main-snow"></div>
-  </div>
-  <div id="cursor"></div>
-  <script>
-    const config = {
-      site_name: "Balram",
-      favicon: "favicon.png",
-      logo: "logo.gif",
-      username: "Balram",
-      by: "invincible v1.1",
-      tagline: "Building Awesome Stuff!!!",
-      background_video: "background.mp4",
-      icons_folder: "assets/icons/",
-      music_files: [
-        "assets/music/SpotiMate.io - GBP _feat. 21 Savage_ - Central Cee.mp3",
-        "assets/music/Artemas - i like the way you kiss me (official music video).mp3",
-        "assets/music/i like the way you kiss me (CS2 MONTAGE).mp3",
-        "assets/music/Booter Bee - Phone Call.mp3",
-        "assets/music/touch.cas.mp3"
-      ],
-      links: [
-        { name: "GitHub", icon: "github.png", url: "https://github.com/Balram-1" },
-        { name: "Steam", icon: "steam.png", url: "https://steamcommunity.com/id/Balrampreet/" },
-        { name: "Discord", icon: "discord.png", url: "https://discord.com/users/1024993729582469130" },
-        { name: "LTC", icon: "ltc.png", url: "https://blockchair.com/litecoin/address/ltc1q2j4zjvuusddwf66mzv2wud8r6ejc38sjpjp5d5" },
-        { name: "Spotify", icon: "spotify.png", url: "https://open.spotify.com/user/31rooy6f3tn6d5idx5yffeihdjlm" },
-        { name: "Try Hack Me", icon: "tryhackme.png", url: "https://tryhackme.com/p/Balram11" }
-      ]
-    };
+    
+    <!-- Main Content -->
+    <div id="mainContent" style="display:none;">
+        <div id="particles-js"></div>
+        <video autoplay muted loop id="bgVideo">
+            <source src="background.mp4" type="video/mp4">
+        </video>
+        
+        <!-- View Counter -->
+        <div class="view-counter" id="view-counter">Views: 0</div>
+        
+        <!-- Music Controls -->
+        <div class="music-controls">
+            <div class="music-btn" id="prev-btn"><i class="fas fa-step-backward"></i></div>
+            <div class="music-btn" id="play-btn"><i class="fas fa-play"></i></div>
+            <div class="music-btn" id="next-btn"><i class="fas fa-step-forward"></i></div>
+        </div>
+        
+        <div class="main-content tilt" id="main-tilt">
+            <!-- Logo at top center -->
+            <div class="logo-top">
+                <img src="logo.gif" alt="Logo" class="logo-gif">
+            </div>
+            
+            <div class="info-side">
+                <h1 id="username">
+                    <span id="username-text">Balram</span>
+                    <span class="by" id="byline">v1.1</span>
+                    <div id="sparkle-container"></div>
+                </h1>
+                <div class="tagline-container">
+                    <span id="tagline">Building Awesome Stuff!!!</span>
+                    <span class="blinking-cursor" id="tag-cursor">|</span>
+                </div>
+                <div class="link-grid" id="link-grid"></div>
+                <audio id="audio-player" style="display:none;" autoplay></audio>
+            </div>
+        </div>
+        <div id="main-snow"></div>
+    </div>
+    <div id="cursor"></div>
+    
+    <script>
+        // Configuration - This would normally be in config.json
+        const config = {
+            site_name: "Balram",
+            favicon: "favicon.png",
+            logo: "logo.gif",
+            username: "Balram",
+            by: "v1.1",
+            tagline: [
+                "Building Awesome Stuff!!!",
+                "Exploring the World of Cybersecurity",
+                "Passionate about Technology and Innovation",
+                "Crafting Digital Experiences",
+                "Empowering Through Knowledge",
+                "Innovating for a Better Tomorrow"
+            ],
+            background_video: "background.mp4",
+            icons_folder: "assets/icons/",
+            music_files: [
+                "assets/music/SpotiMate.io - GBP _feat. 21 Savage_ - Central Cee.mp3",
+                "assets/music/Artemas - i like the way you kiss me (official music video).mp3",
+                "assets/music/Booter Bee - Phone Call.mp3",
+                "assets/music/touch.cas.mp3"
+            ],
+            links: [
+                { name: "GitHub", icon: "github.png", url: "https://github.com/Balram-1" },
+                { name: "Steam", icon: "steam.png", url: "https://steamcommunity.com/id/Balrampreet/" },
+                { name: "Discord", icon: "discord.png", url: "https://discord.com/users/1024993729582469130" },
+                { name: "LTC", icon: "ltc.png", url: "https://blockchair.com/litecoin/address/ltc1q2j4zjvuusddwf66mzv2wud8r6ejc38sjpjp5d5" },
+                { name: "Spotify", icon: "spotify.png", url: "https://open.spotify.com/user/31rooy6f3tn6d5idx5yffeihdjlm" },
+                { name: "Try Hack Me", icon: "tryhackme.png", url: "https://tryhackme.com/p/Balram11" }
+            ]
+        };
 
-    // Cursor init
-    const cursor = document.getElementById("cursor");
-    cursor.style.left = window.innerWidth / 2 + "px";
-    cursor.style.top = window.innerHeight / 2 + "px";
-    document.addEventListener("mousemove", e => {
-      cursor.style.left = e.clientX + "px";
-      cursor.style.top = e.clientY + "px";
-    });
+        // Initialize the page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize particles background
+            particlesJS("particles-js", {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#00ffff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: false },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#00ffff",
+                        opacity: 0.4,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: "none",
+                        random: false,
+                        straight: false,
+                        out_mode: "out"
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "grab" },
+                        onclick: { enable: true, mode: "push" },
+                        resize: true
+                    }
+                }
+            });
 
-    // Site title typing/erasing effect
-    const siteTitle = document.getElementById("site-title");
-    const fullText = config.site_name;
-    const eraseUpToChar = fullText[0];
-    const eraseIndex = fullText.indexOf(eraseUpToChar) + 1;
-    let step = 0, phase = "typing", displayText = "";
-    function typeEraseLoop() {
-      if (phase === "typing") {
-        step++;
-        if (step > fullText.length) {
-          phase = "erasing";
-          step = fullText.length;
-        }
-      } else if (phase === "erasing") {
-        step--;
-        if (step < eraseIndex) {
-          phase = "typingFromErase";
-          step = eraseIndex;
-        }
-      } else if (phase === "typingFromErase") {
-        step++;
-        if (step > fullText.length) {
-          phase = "erasing";
-          step = fullText.length;
-        }
-      }
-      displayText = fullText.slice(0, step);
-      siteTitle.textContent = displayText;
-      setTimeout(typeEraseLoop, 180);
-    }
-    typeEraseLoop();
+            // Initialize cursor
+            const cursor = document.getElementById("cursor");
+            document.addEventListener("mousemove", e => {
+                cursor.classList.add("active");
+                cursor.style.left = e.clientX + "px";
+                cursor.style.top = e.clientY + "px";
+                
+                // Create cursor trail
+                const trail = document.createElement("div");
+                trail.className = "cursor-trail";
+                trail.style.left = e.clientX + "px";
+                trail.style.top = e.clientY + "px";
+                document.body.appendChild(trail);
+            });
 
-    // Preloader typing effect
-    const preloaderText = document.getElementById("preloader-text");
-    let preloaderMsg = "Click to Enter!";
-    let preloaderIdx = 0, preloaderDir = 1;
-    setInterval(() => {
-      if (preloaderDir === 1) {
-        preloaderIdx++;
-        if (preloaderIdx > preloaderMsg.length) preloaderDir = -1;
-      } else {
-        preloaderIdx--;
-        if (preloaderIdx === 0) preloaderDir = 1;
-      }
-      preloaderText.textContent = preloaderMsg.slice(0, preloaderIdx);
-    }, 100);
+            // Click effects
+            document.addEventListener("click", e => {
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const spark = document.createElement("div");
+                        spark.className = "cursor-trail";
+                        spark.style.left = e.clientX + (Math.random() * 20 - 10) + "px";
+                        spark.style.top = e.clientY + (Math.random() * 20 - 10) + "px";
+                        spark.style.background = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                        spark.style.width = Math.random() * 15 + 5 + "px";
+                        spark.style.height = spark.style.width;
+                        document.body.appendChild(spark);
+                    }, i * 50);
+                }
+            });
 
-    // Snow effect
-    function createSnow(containerId, speed = 1, zigzag = false) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      setInterval(() => {
-        if (!document.body.contains(container)) return;
-        let flake = document.createElement("div");
-        flake.className = "snowflake";
-        flake.textContent = "❄";
-        flake.style.left = Math.random() * 100 + "vw";
-        flake.style.fontSize = 14 + Math.random() * 10 + "px";
-        flake.style.opacity = 0.7 + Math.random() * 0.3;
-        if (zigzag) {
-          flake.style.setProperty("--zigzag", (Math.random() > 0.5 ? 1 : -1) * 80 + "px");
-        }
-        container.appendChild(flake);
-        setTimeout(() => {
-          if (container.contains(flake)) container.removeChild(flake);
-        }, 13000 / speed);
-      }, 600 / speed);
-    }
-    createSnow("preloader-snow", 0.7, true);
+            // Snow effect for preloader
+            function createSnow(containerId) {
+                const container = document.getElementById(containerId);
+                setInterval(() => {
+                    const flake = document.createElement("div");
+                    flake.className = "snowflake";
+                    flake.textContent = "❄";
+                    flake.style.left = Math.random() * 100 + "vw";
+                    flake.style.fontSize = 14 + Math.random() * 15 + "px";
+                    flake.style.opacity = 0.7 + Math.random() * 0.3;
+                    flake.style.setProperty("--zigzag", (Math.random() > 0.5 ? 1 : -1) * 100 + "px");
+                    container.appendChild(flake);
+                    
+                    setTimeout(() => {
+                        if (container.contains(flake)) container.removeChild(flake);
+                    }, 15000);
+                }, 500);
+            }
+            createSnow("preloader-snow");
 
-    // Enter site
-    document.getElementById("preloader").addEventListener("click", () => {
-      document.getElementById("preloader").style.display = "none";
-      document.getElementById("mainContent").style.display = "block";
-      startMainFeatures();
-    });
+            // Preloader click event
+            document.getElementById("preloader").addEventListener("click", function() {
+                this.style.opacity = "0";
+                setTimeout(() => {
+                    this.style.display = "none";
+                    document.getElementById("mainContent").style.display = "block";
+                    startMainFeatures();
+                }, 1000);
+            });
 
-    // Main features
-    function startMainFeatures() {
-      // Background video
-      const videoSource = document.getElementById("bgVideo").querySelector("source");
-      if (videoSource) {
-        videoSource.src = config.background_video;
-        document.getElementById("bgVideo").load();
-      }
+            // View counter functionality
+            async function updateViewCounter() {
+                try {
+                    const response = await fetch('https://api.countapi.xyz/hit/balram-profile/view-counter');
+                    const data = await response.json();
+                    document.getElementById('view-counter').textContent = `Views: ${data.value}`;
+                } catch (error) {
+                    document.getElementById('view-counter').textContent = 'Views: 0';
+                }
+            }
 
-      // Username and byline
-      document.getElementById("username-text").textContent = config.username;
-      document.getElementById("byline").textContent = config.by;
-      startSparkles();
+            // Sparkle effect for username
+            function createSparkles() {
+                const container = document.getElementById("sparkle-container");
+                setInterval(() => {
+                    const sparkle = document.createElement("div");
+                    sparkle.className = "sparkle";
+                    sparkle.textContent = "✦";
+                    sparkle.style.left = Math.random() * 100 + "%";
+                    sparkle.style.top = Math.random() * 100 + "%";
+                    sparkle.style.setProperty("--tx", (Math.random() - 0.5) * 20 + "px");
+                    sparkle.style.setProperty("--ty", (Math.random() - 0.5) * 20 + "px");
+                    container.appendChild(sparkle);
+                    
+                    setTimeout(() => {
+                        if (container.contains(sparkle)) container.removeChild(sparkle);
+                    }, 2000);
+                }, 300);
+            }
 
-      // Tagline typing
-      const tagline = config.tagline;
-      let tagIdx = 0, tagDir = 1;
-      function tagTick() {
-        document.getElementById("tagline").textContent = tagline.slice(0, tagIdx);
-        if (tagDir === 1) {
-          tagIdx++;
-          if (tagIdx > tagline.length) tagDir = -1;
-        } else {
-          tagIdx--;
-          if (tagIdx < 0) tagDir = 1;
-        }
-        setTimeout(tagTick, 90);
-      }
-      tagTick();
+            // Music player functionality
+            function setupMusicPlayer() {
+                const audio = document.getElementById("audio-player");
+                const playBtn = document.getElementById("play-btn");
+                const nextBtn = document.getElementById("next-btn");
+                const prevBtn = document.getElementById("prev-btn");
+                let currentTrack = 0;
+                let isPlaying = true;
+                
+                function loadTrack() {
+                    audio.src = config.music_files[currentTrack];
+                    audio.play().catch(e => console.log("Audio play error:", e));
+                }
+                
+                function playNext() {
+                    currentTrack = (currentTrack + 1) % config.music_files.length;
+                    loadTrack();
+                }
+                
+                function playPrev() {
+                    currentTrack = (currentTrack - 1 + config.music_files.length) % config.music_files.length;
+                    loadTrack();
+                }
+                
+                function togglePlay() {
+                    if (isPlaying) {
+                        audio.pause();
+                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    } else {
+                        audio.play();
+                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    }
+                    isPlaying = !isPlaying;
+                }
+                
+                audio.addEventListener("ended", playNext);
+                playBtn.addEventListener("click", togglePlay);
+                nextBtn.addEventListener("click", playNext);
+                prevBtn.addEventListener("click", playPrev);
+                
+                // Start playing
+                loadTrack();
+            }
 
-      // Social links
-      const grid = document.querySelector(".link-grid");
-      grid.innerHTML = "";
-      config.links.forEach(link => {
-        let a = document.createElement("a");
-        a.href = link.url;
-        a.target = "_blank";
-        let img = document.createElement("img");
-        img.src = config.icons_folder + link.icon;
-        img.alt = link.name;
-        a.appendChild(img);
-        let span = document.createElement("span");
-        span.textContent = link.name;
-        a.appendChild(span);
-        grid.appendChild(a);
-      });
-
-      // Main snow
-      createSnow("main-snow", 0.5, true);
-
-      // Cursor snow trail
-      document.addEventListener("mousemove", e => {
-        let flake = document.createElement("div");
-        flake.className = "snowflake";
-        flake.textContent = "❄";
-        flake.style.left = e.clientX + (Math.random() * 8 - 4) + "px";
-        flake.style.top = e.clientY + (Math.random() * 8 - 4) + "px";
-        flake.style.fontSize = 10 + Math.random() * 8 + "px";
-        flake.style.opacity = 0.7 + Math.random() * 0.3;
-        document.body.appendChild(flake);
-        setTimeout(() => {
-          if (document.body.contains(flake)) document.body.removeChild(flake);
-        }, 1800);
-      });
-
-      // 3D tilt effect
-      if (window.VanillaTilt && document.querySelector(".tilt")) {
-        VanillaTilt.init(document.querySelector(".tilt"), {
-          max: 10,
-          speed: 800,
-          glare: false,
-          scale: 1.02,
+            // Main features initialization
+            function startMainFeatures() {
+                // Update view counter
+                updateViewCounter();
+                
+                // Set username and byline
+                document.getElementById("username-text").textContent = config.username;
+                document.getElementById("byline").textContent = config.by;
+                
+                // Create sparkles
+                createSparkles();
+                
+                // Tagline typing effect
+                const taglines = config.tagline;
+                let taglineIdx = 0, charIdx = 0, typing = true;
+                
+                function typeTagline() {
+                    const current = taglines[taglineIdx];
+                    if (typing) {
+                        charIdx++;
+                        if (charIdx > current.length) {
+                            typing = false;
+                            setTimeout(typeTagline, 1500);
+                            return;
+                        }
+                    } else {
+                        charIdx--;
+                        if (charIdx < 0) {
+                            typing = true;
+                            taglineIdx = (taglineIdx + 1) % taglines.length;
+                            setTimeout(typeTagline, 300);
+                            return;
+                        }
+                    }
+                    document.getElementById("tagline").textContent = current.slice(0, charIdx);
+                    setTimeout(typeTagline, typing ? 60 : 30);
+                }
+                typeTagline();
+                
+                // Create social links
+                const grid = document.getElementById('link-grid');
+                config.links.forEach(link => {
+                    const a = document.createElement('a');
+                    a.href = link.url;
+                    a.target = "_blank";
+                    
+                    const img = document.createElement('img');
+                    img.src = config.icons_folder + link.icon;
+                    img.alt = link.name;
+                    a.appendChild(img);
+                    
+                    const span = document.createElement('span');
+                    span.textContent = link.name;
+                    a.appendChild(span);
+                    
+                    grid.appendChild(a);
+                });
+                
+                // Initialize tilt effect
+                if (window.VanillaTilt) {
+                    VanillaTilt.init(document.querySelector(".tilt"), {
+                        max: 8,
+                        speed: 800,
+                        glare: true,
+                        "max-glare": 0.1,
+                        scale: 1.02,
+                    });
+                }
+                
+                // Setup music player
+                setupMusicPlayer();
+                
+                // Create snow for main content
+                createSnow("main-snow");
+            }
         });
-      }
-
-      // Start music player
-      startMusicPlayer();
-    }
-
-    // Sparkles on username only
-    function startSparkles() {
-      const container = document.getElementById("sparkle-container");
-      if (!container) return;
-      function createSparkle() {
-        if (!container || !document.body.contains(container)) return;
-        const sparkle = document.createElement("span");
-        sparkle.textContent = "✦";
-        sparkle.style.position = "absolute";
-        sparkle.style.left = Math.random() * 100 + "%";
-        sparkle.style.top = Math.random() * 100 + "%";
-        sparkle.style.fontSize = 6 + Math.random() * 6 + "px";
-        sparkle.style.opacity = 0.7 + Math.random() * 0.3;
-        sparkle.style.color = "#fff";
-        sparkle.style.pointerEvents = "none";
-        sparkle.style.textShadow = "0 0 6px #fff, 0 0 3px #fff";
-        sparkle.animate(
-          [
-            { transform: "translate(0, 0)" },
-            { transform: `translate(${(Math.random() - 0.5) * 10}px, ${(Math.random() - 0.5) * 10}px)` },
-            { transform: "translate(0, 0)" }
-          ],
-          {
-            duration: 3000 + Math.random() * 2000,
-            iterations: Infinity,
-          }
-        );
-        container.appendChild(sparkle);
-        setTimeout(() => {
-          if (container.contains(sparkle)) container.removeChild(sparkle);
-        }, 3000 + Math.random() * 2000);
-      }
-      setInterval(createSparkle, 400);
-    }
-
-    // Music player: plays all files from assets/music sequentially without UI controls
-    function startMusicPlayer() {
-      const audio = document.getElementById("audio-player");
-      const musicFiles = config.music_files;
-      let idx = Math.floor(Math.random() * musicFiles.length);
-
-      function playNext() {
-        audio.src = musicFiles[idx];
-        audio.play().catch(() => {});
-        idx = (idx + 1) % musicFiles.length;
-      }
-
-      audio.addEventListener("ended", playNext);
-      playNext();
-    }
-  </script>
+    </script>
 </body>
 </html>
